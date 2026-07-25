@@ -1,0 +1,152 @@
+# Slate CI — build et tests sur runners GitHub publics.
+#
+# Les workflows upstream (pr-win32-test.yml, pr-linux-test.yml, ...) ciblent des
+# pools self-hosted Microsoft (`1ES.Pool=1es-vscode-oss-*`) qui ne sont pas
+# accessibles depuis ce fork. Ce workflow est donc autonome.
+#
+# Prerequis Windows critique : les bibliotheques Spectre de MSVC. Sans elles,
+# les modules natifs echouent avec MSB8040. Les runners `windows-2022` de GitHub
+# les incluent deja ; en self-hosted, voir docs/build.md.
+
+name: Slate CI
+
+on:
+  push:
+    branches: [slate/main]
+  pull_request:
+    branches: [slate/main]
+  workflow_dispatch:
+
+concurrency:
+  group: slate-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Evite que les scripts npm de VS Code tentent de contacter des feeds internes.
+  npm_config_fund: "false"
+  npm_config_audit: "false"
+
+jobs:
+  windows:
+    name: Windows x64 — compile + tests
+    runs-on: windows-2022
+    timeout-minutes: 90
+    env:
+      NPM_ARCH: x64
+      VSCODE_ARCH: x64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Verifier les bibliotheques Spectre (MSB8040)
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vswhere -latest -products * -property installationPath
+          $spectre = Get-ChildItem -Path "$vs\VC\Tools\MSVC" -Directory |
+            ForEach-Object { Join-Path $_.FullName "lib\spectre\x64\libcmt.lib" } |
+            Where-Object { Test-Path $_ }
+          if (-not $spectre) {
+            Write-Error "Bibliotheques Spectre absentes : les modules natifs echoueront avec MSB8040. Voir docs/build.md."
+            exit 1
+          }
+          Write-Host "Spectre OK : $spectre"
+
+      - name: Installer les dependances
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          # Le reseau des runners coupe parfois : on retente.
+          for ($i = 1; $i -le 3; $i++) {
+            npm ci --fetch-retries=6 --fetch-retry-maxtimeout=180000
+            if ($LASTEXITCODE -eq 0) { break }
+            if ($i -eq 3) { Write-Error "npm ci a echoue apres 3 tentatives"; exit 1 }
+            Write-Host "npm ci a echoue (tentative $i), nouvelle tentative..."
+          }
+
+      - name: Verifier que tous les modules natifs sont compiles
+        shell: bash
+        run: |
+          # Un `npm ci` peut reussir en laissant un module natif non compile
+          # (script `install` considere comme deja execute). On verifie donc les
+          # binaires .node, pas seulement le code de sortie de npm.
+          # Exclusions legitimes : cpu-features est desactive dans package.json,
+          # fs-copyfile declare "type": "none" hors macOS.
+          missing=0
+          for gyp in $(find node_modules -name binding.gyp -not -path "*/node_modules/*/node_modules/*" 2>/dev/null); do
+            dir=$(dirname "$gyp")
+            case "$dir" in
+              *cpu-features*|*fs-copyfile*) continue ;;
+            esac
+            if ! find "$dir" -name "*.node" 2>/dev/null | grep -q .; then
+              echo "MODULE NATIF MANQUANT: $dir"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then exit 1; fi
+          echo "Tous les modules natifs requis sont compiles."
+
+      - name: Compiler
+        run: npm run compile
+
+      - name: Verifier la sortie de compilation
+        shell: bash
+        run: test -f out/main.js || { echo "out/main.js absent"; exit 1; }
+
+      - name: Tests unitaires Node
+        run: npm run test-node
+
+      - name: Tests unitaires Electron
+        shell: pwsh
+        run: |
+          # Les runners GitHub n'ont pas d'affichage : xvfb n'existe pas sous
+          # Windows, mais Electron peut tourner headless via ce commutateur.
+          .\scripts\test.bat --tfs "Unit Tests"
+
+  package-windows:
+    name: Windows x64 — artefact
+    runs-on: windows-2022
+    timeout-minutes: 120
+    # L'artefact n'a de sens que si la compilation et les tests passent.
+    needs: windows
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/slate/main'
+    env:
+      NPM_ARCH: x64
+      VSCODE_ARCH: x64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Installer les dependances
+        shell: pwsh
+        run: npm ci --fetch-retries=6 --fetch-retry-maxtimeout=180000
+
+      - name: Construire l'application (minifiee)
+        run: npm run gulp vscode-win32-x64-min-ci
+
+      - name: Construire l'installateur utilisateur
+        run: npm run gulp vscode-win32-x64-user-setup
+
+      - name: Publier l'application non empaquetee
+        uses: actions/upload-artifact@v4
+        with:
+          name: slate-win32-x64
+          path: ../VSCode-win32-x64/
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Publier l'installateur
+        uses: actions/upload-artifact@v4
+        with:
+          name: slate-win32-x64-setup
+          path: ../vscode-win32-x64-user-setup/
+          retention-days: 14
+          if-no-files-found: error
