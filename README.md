@@ -31,10 +31,12 @@ des modules natifs.
 
 | Document | Contenu |
 |---|---|
+| [`docs/avancement.md`](docs/avancement.md) | état du projet, items terminés, contraintes établies |
 | [`docs/build.md`](docs/build.md) | prérequis, compilation, tests, empaquetage, images de marque |
 | [`docs/upstream-sync.md`](docs/upstream-sync.md) | procédure de synchronisation avec Code - OSS |
 | [`docs/licensing.md`](docs/licensing.md) | licences des dépendances et séparation des marques |
 | [`docs/backlog-chat.md`](docs/backlog-chat.md) | backlog du panneau de chat IA |
+| [`docs/design.md`](docs/design.md) | direction visuelle et principes d'interface propres à Slate |
 
 ## Extensions intégrées
 
