@@ -143,7 +143,7 @@ jobs:
         run: npm run gulp vscode-win32-x64-user-setup
 
       - name: Publier l'application non empaquetee
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: slate-win32-x64
           path: ../VSCode-win32-x64/
@@ -153,7 +153,7 @@ jobs:
       # `buildWin32Setup` ecrit dans <repo>/.build/win32-<arch>/<target>-setup/
       # (voir setupDir dans build/gulpfile.vscode.win32.ts), pas a cote du depot.
       - name: Publier l'installateur
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: slate-win32-x64-setup
           path: .build/win32-x64/user-setup/SlateUserSetup.exe
