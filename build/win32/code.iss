@@ -4,18 +4,40 @@
       ? ('; LicenseFile: "' + RepoDir + '\licenses\LICENSE-' + Language + '.rtf"') \
       : '; LicenseFile: "' + RepoDir + '\' + RootLicenseFileName + '"'
 
+; Nom du fichier de sortie derive du produit : SlateUserSetup.exe / SlateSetup.exe.
+; NameShort et InstallTarget sont fournis par build/gulpfile.vscode.win32.ts.
+#if "user" == InstallTarget
+  #define SetupBasename NameShort + "UserSetup"
+#else
+  #define SetupBasename NameShort + "Setup"
+#endif
+
+; Annee de construction, pour rester aligne sur build/lib/electron.ts et
+; gulpfile.vscode.ts qui utilisent tous deux `new Date().getFullYear()`.
+#define CopyrightYear GetDateTimeString('yyyy', '', '')
+
+; URL de projet. Definies ici pour etre reutilisables dans les messages du code
+; Pascal ci-dessous : les directives de [Setup] ne sont pas accessibles via {#...}.
+#define ProjectUrl "https://github.com/ZEBDA/slate"
+#define IssuesUrl ProjectUrl + "/issues"
+#define ReleasesUrl ProjectUrl + "/releases"
+
 [Setup]
 AppId={#AppId}
 AppName={#NameLong}
 AppVerName={#NameVersion}
-AppPublisher=Microsoft Corporation
-AppPublisherURL=https://code.visualstudio.com/
-AppSupportURL=https://code.visualstudio.com/
-AppUpdatesURL=https://code.visualstudio.com/
+AppPublisher=Slate
+; Upstream ne declare pas AppCopyright : la propriete LegalCopyright de
+; l'installateur ressortait vide. On aligne sur ce que portent deja l'executable
+; et les binaires natifs (voir build/lib/electron.ts et gulpfile.vscode.ts).
+AppCopyright=Copyright (C) {#CopyrightYear} {#NameLong} contributors. All rights reserved
+AppPublisherURL={#ProjectUrl}
+AppSupportURL={#IssuesUrl}
+AppUpdatesURL={#ReleasesUrl}
 DefaultGroupName={#NameLong}
 AllowNoIcons=yes
 OutputDir={#OutputDir}
-OutputBaseFilename=VSCodeSetup
+OutputBaseFilename={#SetupBasename}
 Compression=lzma
 SolidCompression=yes
 AppMutex={code:GetAppMutex}
@@ -1333,7 +1355,7 @@ begin
 
   #if "user" == InstallTarget
     if not WizardSilent() and IsAdmin() then begin
-      if MsgBox('This User Installer is not meant to be run as an Administrator. If you would like to install VS Code for all users in this system, download the System Installer instead from https://code.visualstudio.com. Are you sure you want to continue?', mbError, MB_OKCANCEL) = IDCANCEL then begin
+      if MsgBox('This User Installer is not meant to be run as an Administrator. If you would like to install {#NameLong} for all users in this system, download the System Installer instead from {#ReleasesUrl}. Are you sure you want to continue?', mbError, MB_OKCANCEL) = IDCANCEL then begin
         Result := False;
       end;
     end;
@@ -1800,7 +1822,7 @@ begin
       if not SessionEndFileExists() and not CancelFileExists() then begin
         StopTunnelServiceIfNeeded();
         Log('Invoking inno_updater for background update');
-        Exec(ExpandConstant('{app}\{#VersionedResourcesFolder}\tools\inno_updater.exe'), ExpandConstant('"{app}\{#ExeBasename}.exe" ' + BoolToStr(LockFileExists()) + ' "{cm:UpdatingVisualStudioCode}"'), '', SW_SHOW, ewWaitUntilTerminated, UpdateResultCode);
+        Exec(ExpandConstant('{app}\{#VersionedResourcesFolder}\tools\inno_updater.exe'), ExpandConstant('"{app}\{#ExeBasename}.exe" ' + BoolToStr(LockFileExists()) + ' "{cm:UpdatingVisualStudioCode,' + '{#NameLong}' + '}"'), '', SW_SHOW, ewWaitUntilTerminated, UpdateResultCode);
         DeleteFile(ExpandConstant('{app}\updating_version'));
         Log('inno_updater completed successfully');
         #if "system" == InstallTarget

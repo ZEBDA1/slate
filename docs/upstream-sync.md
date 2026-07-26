@@ -46,6 +46,8 @@ Nos modifications sont concentrées volontairement pour limiter les conflits :
 | Chemin | Contenu | Risque de conflit |
 |---|---|---|
 | `product.json` | identité produit (24 champs) | élevé — upstream y touche souvent |
+| `build/win32/code.iss` | éditeur, URLs, nom de l'installateur | moyen |
+| `build/win32/i18n/*.isl` | message de mise à jour paramétré (13 langues) | moyen |
 | `build/win32/` | icônes et bitmaps d'installateur | faible |
 | `src/vs/workbench/contrib/slate/` | code IA propre à Slate | nul — chemin inexistant en amont |
 | `docs/` | documentation Slate | nul |
@@ -68,7 +70,15 @@ réduits au minimum (enregistrement de contributions, entrées de `package.json`
 ## Points de vigilance juridiques
 
 - ne jamais réintroduire les marques « Visual Studio Code » ou « VS Code » dans les
-  chaînes visibles ;
+  chaînes visibles ; contrôle rapide après chaque synchronisation :
+
+  ```bash
+  grep -rn "Visual Studio Code\|VS Code" product.json build/win32/code.iss build/win32/i18n/
+  ```
+
+  La clé `UpdatingVisualStudioCode` des fichiers `.isl` conserve volontairement son nom
+  (c'est un identifiant référencé par `code.iss`), mais sa **valeur** doit rester
+  paramétrée par `%1`.
 - `LICENSE.txt` (MIT) et les attributions de `cgmanifest.json` doivent être conservés ;
 - les extensions intégrées (`builtInExtensions` de `product.json`) proviennent du
   Marketplace Microsoft : vérifier les conditions d'utilisation avant redistribution.

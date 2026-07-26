@@ -50,3 +50,7 @@ dist
 .github/prompts/*.local.prompt.md
 .agents/skills/.local/
 .github/skills/.local/
+
+# Slate : artefacts Python du script de generation d images de marque
+__pycache__/
+*.pyc

@@ -230,7 +230,8 @@ export function ensureCopilotPlatformPackage(platform: string, arch: string, nod
  * its bundled copy only if that fails.
  *
  * Failures throw to fail the build because built-in packaging must guarantee
- * this artifact is present.
+ * this artifact is present. Slate exception : l'absence complete du dossier
+ * `sdk` est toleree (voir le commentaire dans la fonction).
  */
 export function prepareBuiltInCopilotRipgrepShim(platform: string, arch: string, builtInCopilotExtensionDir: string, appNodeModulesDir: string): void {
 	const { nodePlatform, nodeArch } = toNodePlatformArch(platform, arch);
@@ -242,7 +243,17 @@ export function prepareBuiltInCopilotRipgrepShim(platform: string, arch: string,
 	const copilotBase = path.join(extensionNodeModules, '@github', 'copilot');
 	const copilotSdkBase = path.join(copilotBase, 'sdk');
 	if (!fs.existsSync(copilotSdkBase)) {
-		throw new Error(`[prepareBuiltInCopilotRipgrepShim] Copilot SDK directory not found at ${copilotSdkBase}`);
+		// Slate : le paquet public `@github/copilot` ne publie que `npm-loader.js`
+		// (champ `files` de son package.json). Le dossier `sdk`, ses `prebuilds` et
+		// `tgrep` ne sont distribues qu'en interne : l'etape ne peut donc jamais
+		// aboutir hors du pipeline Microsoft.
+		//
+		// Upstream leve une exception ici, ce qui interrompt l'empaquetage avant
+		// `patchWin32Dependencies` et produit un paquet incomplet. Slate remplace
+		// l'integration IA par la sienne (voir docs/licensing.md §3) : on degrade
+		// donc en avertissement plutot que d'echouer.
+		console.warn(`[prepareBuiltInCopilotRipgrepShim] SDK Copilot absent (${copilotSdkBase}) : etape ignoree. L'extension Copilot integree ne sera pas fonctionnelle.`);
+		return;
 	}
 	materializeBuiltInCopilotSdkPlatformFiles(copilotPackagePlatformArch, tgrepPlatformArch, copilotBase, appNodeModulesDir);
 	pruneNonTargetCopilotSdkPrebuilds(copilotPackagePlatformArch, path.join(copilotSdkBase, 'prebuilds'), copilotPlatforms);

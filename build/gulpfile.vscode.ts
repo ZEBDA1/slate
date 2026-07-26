@@ -589,7 +589,21 @@ function packageTask(platform: string, arch: string, sourceFolderName: string, d
 function hasAuthenticodeSignature(filePath: string): Promise<boolean> {
 	return new Promise((resolve, reject) => {
 		const proc = cp.spawn('signtool.exe', ['verify', '/pa', filePath]);
-		proc.on('error', reject);
+		proc.on('error', (err: NodeJS.ErrnoException) => {
+			// Slate : `signtool.exe` fait partie du Windows SDK et n'est pas dans le
+			// PATH par defaut. Les pipelines amont l'y ajoutent explicitement (voir
+			// build/azure-pipelines/win32/steps/product-build-win32-compile.yml) ;
+			// une construction locale echoue sinon avec ENOENT.
+			//
+			// Le retrait de signature ne sert qu'a preparer une resignature ESRP, que
+			// nous ne faisons pas : en son absence on considere le binaire comme non
+			// signe et on laisse rcedit travailler directement.
+			if (err.code === 'ENOENT') {
+				resolve(false);
+				return;
+			}
+			reject(err);
+		});
 		proc.on('exit', code => resolve(code === 0));
 	});
 }
@@ -618,6 +632,42 @@ async function stripAuthenticodeSignature(filePath: string): Promise<void> {
 	});
 }
 
+/**
+ * Slate : vrai uniquement pour un binaire Windows (PE).
+ *
+ * `rcedit` ne sait reecrire que les ressources d'un PE et sort en erreur 1
+ * (`Unable to load file`) sur tout autre format. Or certaines dependances
+ * embarquent leurs binaires natifs pour *toutes* les plateformes dans un seul
+ * paquet — par exemple `@anthropic-ai/claude-agent-sdk` fournit six
+ * `vendor/audio-capture/<arch>-<os>/audio-capture.node`, dont quatre ELF ou
+ * Mach-O. Le glob `**\/*.node` les ramasse et l'empaquetage echoue.
+ *
+ * On teste la structure du fichier plutot que son chemin : filtrer sur des noms
+ * de dossiers demanderait une exclusion nouvelle a chaque dependance ajoutee.
+ *
+ * Format : signature `MZ`, puis offset du en-tete PE en 0x3C, ou l'on doit lire
+ * `PE\0\0`.
+ */
+async function isWindowsPEFile(filePath: string): Promise<boolean> {
+	let handle: fs.promises.FileHandle | undefined;
+	try {
+		handle = await fs.promises.open(filePath, 'r');
+		const dosHeader = Buffer.alloc(0x40);
+		const { bytesRead } = await handle.read(dosHeader, 0, dosHeader.length, 0);
+		if (bytesRead < dosHeader.length || dosHeader.readUInt16LE(0) !== 0x5a4d /* MZ */) {
+			return false;
+		}
+		const peOffset = dosHeader.readUInt32LE(0x3c);
+		const peSignature = Buffer.alloc(4);
+		const pe = await handle.read(peSignature, 0, 4, peOffset);
+		return pe.bytesRead === 4 && peSignature.readUInt32LE(0) === 0x00004550 /* PE\0\0 */;
+	} catch {
+		return false;
+	} finally {
+		await handle?.close();
+	}
+}
+
 function patchWin32DependenciesTask(destinationFolderName: string) {
 	const cwd = path.join(path.dirname(root), destinationFolderName);
 
@@ -639,15 +689,21 @@ function patchWin32DependenciesTask(destinationFolderName: string) {
 			const basename = path.basename(dep);
 			const fullPath = path.join(cwd, dep);
 
+			// Slate : ignorer les binaires natifs d'autres plateformes (voir isWindowsPEFile).
+			if (!await isWindowsPEFile(fullPath)) {
+				console.log(`[patchWin32Dependencies] ${dep} n'est pas un PE Windows : ignore.`);
+				return;
+			}
+
 			await stripAuthenticodeSignature(fullPath);
 			await rcedit(fullPath, {
 				'file-version': baseVersion,
 				'version-string': {
-					'CompanyName': 'Microsoft Corporation',
+					'CompanyName': product.nameLong,
 					'FileDescription': product.nameLong,
 					'FileVersion': packageJson.version,
 					'InternalName': basename,
-					'LegalCopyright': 'Copyright (C) 2026 Microsoft. All rights reserved',
+					'LegalCopyright': `Copyright (C) ${new Date().getFullYear()} ${product.nameLong} contributors. All rights reserved`,
 					'OriginalFilename': basename,
 					'ProductName': product.nameLong,
 					'ProductVersion': packageJson.version,

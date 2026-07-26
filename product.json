@@ -161,7 +161,7 @@
 	"onboardingKeymaps": [
 		{
 			"id": "vscode",
-			"label": "VS Code",
+			"label": "Slate",
 			"description": "Default keyboard mapping"
 		},
 		{

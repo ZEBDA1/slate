@@ -132,6 +132,13 @@ jobs:
       - name: Construire l'application (minifiee)
         run: npm run gulp vscode-win32-x64-min-ci
 
+      # Indispensable AVANT user-setup : cette tache remplit tools/
+      # (inno_updater.exe, vcruntime140.dll). L'entree correspondante de
+      # code.iss n'a pas le drapeau `skipifsourcedoesntexist`, donc l'omettre
+      # fait echouer l'installateur sur `No files found matching "...\tools\*"`.
+      - name: Preparer les outils de l'installateur
+        run: npm run gulp vscode-win32-x64-inno-updater
+
       - name: Construire l'installateur utilisateur
         run: npm run gulp vscode-win32-x64-user-setup
 
@@ -143,10 +150,12 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+      # `buildWin32Setup` ecrit dans <repo>/.build/win32-<arch>/<target>-setup/
+      # (voir setupDir dans build/gulpfile.vscode.win32.ts), pas a cote du depot.
       - name: Publier l'installateur
         uses: actions/upload-artifact@v4
         with:
           name: slate-win32-x64-setup
-          path: ../vscode-win32-x64-user-setup/
+          path: .build/win32-x64/user-setup/SlateUserSetup.exe
           retention-days: 14
           if-no-files-found: error
