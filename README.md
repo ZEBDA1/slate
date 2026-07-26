@@ -1,78 +1,58 @@
-# Visual Studio Code - Open Source ("Code - OSS")
-[![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/microsoft/vscode/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
-[![Bugs](https://img.shields.io/github/issues/microsoft/vscode/bug.svg)](https://github.com/microsoft/vscode/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)
-[![Gitter](https://img.shields.io/badge/chat-on%20gitter-yellow.svg)](https://gitter.im/Microsoft/vscode)
+# Slate
 
-## The Repository
+Slate est un éditeur de code pour le bureau, avec une intégration IA native. C'est un fork de
+[Code - OSS](https://github.com/microsoft/vscode) (licence MIT), le dépôt de code source ouvert
+sur lequel repose Visual Studio Code.
 
-This repository ("`Code - OSS`") is where we (Microsoft) develop the [Visual Studio Code](https://code.visualstudio.com) product together with the community. Not only do we work on code and issues here, but we also publish our [roadmap](https://github.com/microsoft/vscode/wiki/Roadmap), [monthly iteration plans](https://github.com/microsoft/vscode/wiki/Iteration-Plans), and our [endgame plans](https://github.com/microsoft/vscode/wiki/Running-the-Endgame). This source code is available to everyone under the standard [MIT license](https://github.com/microsoft/vscode/blob/main/LICENSE.txt).
+Slate n'est pas affilié à Microsoft, ni approuvé par Microsoft. « Visual Studio Code » et
+« VS Code » sont des marques de Microsoft Corporation, utilisées ici uniquement pour désigner
+le projet d'origine.
 
-## Visual Studio Code
+État : **en développement**. Sprint 1 terminé — l'application compile, se lance et produit un
+installateur Windows sous sa propre identité. Le panneau de chat IA est le sujet du Sprint 2
+(voir [`docs/backlog-chat.md`](docs/backlog-chat.md)).
 
-<p align="center">
-  <img alt="VS Code in action" src="https://github.com/user-attachments/assets/56af271c-949d-454c-a3ea-16188c063414">
-</p>
+## Compiler et lancer
 
-[Visual Studio Code](https://code.visualstudio.com) is a distribution of the `Code - OSS` repository with Microsoft-specific customizations released under a traditional [Microsoft product license](https://code.visualstudio.com/License/).
+Plateforme vérifiée : Windows x64. Prévoir ~15 Go d'espace disque et des outils C++.
 
-[Visual Studio Code](https://code.visualstudio.com) combines the simplicity of a code editor with what developers need for their core edit-build-debug cycle. It provides comprehensive code editing, navigation, and understanding support along with lightweight debugging, a rich extensibility model, and lightweight integration with existing tools.
+```bash
+npm ci
+npm run compile
+./scripts/code.bat
+```
 
-Visual Studio Code is updated monthly with new features and bug fixes. You can download it for Windows, macOS, and Linux on [Visual Studio Code's website](https://code.visualstudio.com/Download). To get the latest releases every day, install the [Insiders build](https://code.visualstudio.com/insiders).
+Les prérequis exacts, les pièges rencontrés et la procédure d'empaquetage sont dans
+[`docs/build.md`](docs/build.md). **À lire avant le premier `npm ci`** : les bibliothèques
+Spectre de MSVC ne sont pas installées par défaut et leur absence fait échouer la compilation
+des modules natifs.
 
-## Contributing
+## Documentation
 
-There are many ways in which you can participate in this project, for example:
+| Document | Contenu |
+|---|---|
+| [`docs/build.md`](docs/build.md) | prérequis, compilation, tests, empaquetage, images de marque |
+| [`docs/upstream-sync.md`](docs/upstream-sync.md) | procédure de synchronisation avec Code - OSS |
+| [`docs/licensing.md`](docs/licensing.md) | licences des dépendances et séparation des marques |
+| [`docs/backlog-chat.md`](docs/backlog-chat.md) | backlog du panneau de chat IA |
 
-* [Submit bugs and feature requests](https://github.com/microsoft/vscode/issues), and help us verify as they are checked in
-* Review [source code changes](https://github.com/microsoft/vscode/pulls)
-* Review the [documentation](https://github.com/microsoft/vscode-docs) and make pull requests for anything from typos to new content.
+## Extensions intégrées
 
-If you are interested in fixing issues and contributing directly to the code base,
-please see the document [How to Contribute](https://github.com/microsoft/vscode/wiki/How-to-Contribute), which covers the following:
+Le dossier [`extensions`](extensions) contient les extensions livrées avec l'éditeur :
+grammaires, extraits de code et prise en charge des langages. Celles dont le nom se termine par
+`language-features` fournissent les fonctions riches (suggestions, aller à la définition).
 
-* [How to build and run from source](https://github.com/microsoft/vscode/wiki/How-to-Contribute)
-* [The development workflow, including debugging and running tests](https://github.com/microsoft/vscode/wiki/How-to-Contribute#debugging)
-* [Coding guidelines](https://github.com/microsoft/vscode/wiki/Coding-Guidelines)
-* [Submitting pull requests](https://github.com/microsoft/vscode/wiki/How-to-Contribute#pull-requests)
-* [Finding an issue to work on](https://github.com/microsoft/vscode/wiki/How-to-Contribute#where-to-contribute)
-* [Contributing to translations](https://aka.ms/vscodeloc)
+## Contribuer
 
-## Feedback
+Voir [`CONTRIBUTING.md`](CONTRIBUTING.md). Les vulnérabilités de sécurité se signalent en privé,
+selon [`SECURITY.md`](SECURITY.md) — pas par une issue publique.
 
-* Ask a question on [Stack Overflow](https://stackoverflow.com/questions/tagged/vscode)
-* [Request a new feature](CONTRIBUTING.md)
-* Upvote [popular feature requests](https://github.com/microsoft/vscode/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
-* [File an issue](https://github.com/microsoft/vscode/issues)
-* Connect with the extension author community on [GitHub Discussions](https://github.com/microsoft/vscode-discussions/discussions) or [Slack](https://aka.ms/vscode-dev-community)
-* Follow [@code](https://x.com/code) and let us know what you think!
+## Licence
 
-See our [wiki](https://github.com/microsoft/vscode/wiki/Feedback-Channels) for a description of each of these channels and information on some other available community-driven channels.
+Le code repris de Code - OSS est sous licence [MIT](LICENSE.txt),
+`Copyright (c) 2015 - present Microsoft Corporation` : cet avis est conservé, comme la licence
+l'exige. Les ajouts propres à Slate suivent la même licence.
 
-## Related Projects
-
-Many of the core components and extensions to VS Code live in their own repositories on GitHub. For example, the [node debug adapter](https://github.com/microsoft/vscode-node-debug) and the [mono debug adapter](https://github.com/microsoft/vscode-mono-debug) repositories are separate from each other. For a complete list, please visit the [Related Projects](https://github.com/microsoft/vscode/wiki/Related-Projects) page on our [wiki](https://github.com/microsoft/vscode/wiki).
-
-## Bundled Extensions
-
-VS Code includes a set of built-in extensions located in the [extensions](extensions) folder, including grammars and snippets for many languages. Extensions that provide rich language support (inline suggestions, Go to Definition) for a language have the suffix `language-features`. For example, the `json` extension provides coloring for `JSON` and the `json-language-features` extension provides rich language support for `JSON`.
-
-## Development Container
-
-This repository includes a Visual Studio Code Dev Containers / GitHub Codespaces development container.
-
-* For [Dev Containers](https://aka.ms/vscode-remote/download/containers), use the **Dev Containers: Clone Repository in Container Volume...** command which creates a Docker volume for better disk I/O on macOS and Windows.
-  * If you already have VS Code and Docker installed, you can also click [here](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/microsoft/vscode) to get started. This will cause VS Code to automatically install the Dev Containers extension if needed, clone the source code into a container volume, and spin up a dev container for use.
-
-* For Codespaces, install the [GitHub Codespaces](https://marketplace.visualstudio.com/items?itemName=GitHub.codespaces) extension in VS Code, and use the **Codespaces: Create New Codespace** command.
-
-Docker / the Codespace should have at least **4 cores and 6 GB of RAM (8 GB recommended)** to run a full build. See the [development container README](.devcontainer/README.md) for more information.
-
-## Code of Conduct
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
-## License
-
-Copyright (c) Microsoft Corporation. All rights reserved.
-
-Licensed under the [MIT](LICENSE.txt) license.
+Les marques et logos ne sont pas couverts par la MIT : les images de Slate sont générées par
+[`build/slate/generate-branding.py`](build/slate/generate-branding.py) et ne reprennent aucun
+élément graphique de Microsoft. Détail dans [`docs/licensing.md`](docs/licensing.md).

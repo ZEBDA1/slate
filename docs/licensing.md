@@ -44,6 +44,12 @@ Corrections appliquées pendant le Sprint 1 :
   correction, les propriétés de `Slate.exe` affichaient « Microsoft Corporation » ;
 - `build/gulpfile.vscode.ts` — même correction pour `patchWin32Dependencies`, qui estampille
   les `.node`, `rg.exe` et DLL du paquet ;
+- `README.md`, `CONTRIBUTING.md`, `SECURITY.md` — réécrits. Ce sont les trois fichiers les
+  plus visibles du dépôt et ils décrivaient encore le produit de Microsoft. `SECURITY.md`
+  était le plus gênant : il renvoyait les signalements de vulnérabilité vers
+  `https://aka.ms/SECURITY.md`, canal qui ne traite pas les failles propres à ce fork. Les
+  trois documents renvoient désormais vers le dépôt du fork, en conservant la mention
+  d'origine et le renvoi vers l'amont quand la faille y existe aussi ;
 - `resources/win32/VisualElementsManifest.xml` — `ShortDisplayName` et couleur de fond ;
 - `resources/server/manifest.json` — nom du manifeste web ;
 - `src/vs/platform/product/common/product.ts` — valeurs de repli en exécution depuis
@@ -67,6 +73,7 @@ références nominatives légitimes, à ne pas renommer.
 
 ```bash
 git grep -nI -e "Visual Studio Code" -e "VS Code" -e "Code - OSS" -e "Microsoft Corporation" -- \
+  README.md CONTRIBUTING.md SECURITY.md \
   product.json build/win32 build/lib/electron.ts build/gulpfile.vscode.ts \
   resources src/vs/platform/product
 ```
