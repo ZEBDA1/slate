@@ -1,0 +1,267 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.slate-chat-view {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+	color: var(--vscode-foreground);
+	background: var(--vscode-sideBar-background);
+}
+
+.slate-chat-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 36px;
+	padding: 0 10px 0 14px;
+	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border, transparent);
+}
+
+.slate-chat-toolbar-title {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	color: var(--vscode-descriptionForeground);
+}
+
+.slate-chat-scroll {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+	overflow: auto;
+	padding: 28px 18px 20px;
+}
+
+.slate-chat-welcome {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	max-width: 420px;
+	margin: auto;
+	text-align: center;
+}
+
+.slate-chat-mark {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	margin-bottom: 14px;
+	border: 1px solid var(--vscode-widget-border, transparent);
+	border-radius: 10px;
+	background: color-mix(in srgb, var(--vscode-button-background) 14%, transparent);
+	color: var(--vscode-button-background);
+}
+
+.slate-chat-mark .codicon {
+	font-size: 17px;
+}
+
+.slate-chat-eyebrow {
+	margin-bottom: 7px;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	color: var(--vscode-descriptionForeground);
+}
+
+.slate-chat-heading {
+	margin: 0;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1.35;
+	letter-spacing: -0.015em;
+}
+
+.slate-chat-description {
+	max-width: 320px;
+	margin: 8px 0 22px;
+	font-size: 12px;
+	line-height: 1.5;
+	color: var(--vscode-descriptionForeground);
+}
+
+.slate-chat-suggestions {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 6px;
+	width: 100%;
+}
+
+.slate-chat-suggestion {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	min-height: 34px;
+	padding: 7px 10px 7px 12px;
+	border: 1px solid var(--vscode-widget-border, transparent);
+	border-radius: 6px;
+	color: var(--vscode-foreground);
+	background: color-mix(in srgb, var(--vscode-editorWidget-background) 72%, transparent);
+	font: inherit;
+	font-size: 12px;
+	text-align: left;
+	cursor: pointer;
+}
+
+.slate-chat-suggestion .codicon {
+	font-size: 12px;
+	opacity: 0;
+	transform: translateX(-3px);
+	transition: opacity 80ms ease, transform 80ms ease;
+}
+
+.slate-chat-suggestion:hover {
+	border-color: var(--vscode-focusBorder);
+	background: var(--vscode-list-hoverBackground);
+}
+
+.slate-chat-suggestion:hover .codicon,
+.slate-chat-suggestion:focus-visible .codicon {
+	opacity: 0.8;
+	transform: translateX(0);
+}
+
+.slate-chat-suggestion:focus-visible,
+.slate-chat-icon-button:focus-visible,
+.slate-chat-context-button:focus-visible,
+.slate-chat-mode-button:focus-visible,
+.slate-chat-input:focus-visible {
+	outline: 1px solid var(--vscode-focusBorder);
+	outline-offset: -1px;
+}
+
+.slate-chat-composer-region {
+	flex: 0 0 auto;
+	padding: 0 10px 8px;
+	background: linear-gradient(to bottom, transparent, var(--vscode-sideBar-background) 18px);
+}
+
+.slate-chat-composer {
+	max-width: 560px;
+	margin: 0 auto;
+	padding: 7px;
+	border: 1px solid var(--vscode-input-border, var(--vscode-widget-border));
+	border-radius: 9px;
+	background: var(--vscode-input-background);
+	box-shadow: 0 5px 18px color-mix(in srgb, #000 13%, transparent);
+}
+
+.slate-chat-composer:focus-within {
+	border-color: var(--vscode-focusBorder);
+}
+
+.slate-chat-input {
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+	min-height: 54px;
+	max-height: 180px;
+	padding: 7px 8px;
+	resize: none;
+	border: 0;
+	outline: 0;
+	color: var(--vscode-input-foreground);
+	background: transparent;
+	font-family: var(--vscode-font-family);
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+.slate-chat-input::placeholder {
+	color: var(--vscode-input-placeholderForeground);
+}
+
+.slate-chat-composer-toolbar,
+.slate-chat-composer-tools,
+.slate-chat-composer-controls {
+	display: flex;
+	align-items: center;
+}
+
+.slate-chat-composer-toolbar {
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.slate-chat-composer-tools,
+.slate-chat-composer-controls {
+	gap: 3px;
+}
+
+.slate-chat-icon-button,
+.slate-chat-context-button,
+.slate-chat-mode-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 26px;
+	padding: 0 7px;
+	border: 0;
+	border-radius: 5px;
+	color: var(--vscode-descriptionForeground);
+	background: transparent;
+	font: inherit;
+	font-size: 11px;
+	cursor: pointer;
+}
+
+.slate-chat-icon-button {
+	width: 26px;
+	padding: 0;
+}
+
+.slate-chat-context-button,
+.slate-chat-mode-button {
+	gap: 4px;
+}
+
+.slate-chat-icon-button:hover:not(:disabled),
+.slate-chat-context-button:hover,
+.slate-chat-mode-button:hover {
+	color: var(--vscode-foreground);
+	background: var(--vscode-toolbar-hoverBackground);
+}
+
+.slate-chat-send-button {
+	border-radius: 6px;
+	color: var(--vscode-button-foreground);
+	background: var(--vscode-button-background);
+}
+
+.slate-chat-send-button:disabled {
+	opacity: 0.42;
+	cursor: default;
+}
+
+.slate-chat-preview-label {
+	margin-top: 5px;
+	font-size: 10px;
+	text-align: center;
+	color: var(--vscode-descriptionForeground);
+	opacity: 0.7;
+}
+
+@media (max-width: 260px) {
+	.slate-chat-scroll {
+		padding-right: 12px;
+		padding-left: 12px;
+	}
+
+	.slate-chat-description {
+		display: none;
+	}
+
+	.slate-chat-context-button span,
+	.slate-chat-mode-button span {
+		display: none;
+	}
+}
+

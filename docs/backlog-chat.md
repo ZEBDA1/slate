@@ -3,7 +3,7 @@
 Prépare l'item « panneau de chat IA » du MVP. Les tâches sont ordonnées : chacune
 s'appuie sur les précédentes et reste vérifiable de bout en bout.
 
-État : rédigé en fin de Sprint 1. Aucune ligne de code IA n'est encore écrite.
+État : Sprint 2 en cours. S2-01 à S2-03 sont terminés ; S2-04 est le prochain item.
 
 ## Contexte technique constaté
 
@@ -19,6 +19,8 @@ Deux points relevés pendant le Sprint 1 qui pèsent sur ce sprint :
 
 ## S2-01 — Décider de la stratégie vis-à-vis de l'agent host upstream
 
+État : **terminé** — voir [`docs/adr/001-agent-host.md`](adr/001-agent-host.md).
+
 Avant tout code. Trois options : réutiliser l'agent host existant, le contourner
 avec un service Slate autonome, ou le désactiver.
 
@@ -29,6 +31,10 @@ réutilisé, ce qui est écrit à neuf.
 
 ## S2-02 — Squelette du panneau de chat
 
+État : **terminé** — contribution `src/vs/workbench/contrib/slate/`, vue dans la barre
+auxiliaire droite, commande `Slate: Open Chat` et première maquette visuelle inspirée des
+éditeurs IA modernes.
+
 Créer `src/vs/workbench/contrib/slate/browser/` avec une vue enregistrée dans le
 panneau latéral, une icône, un titre, et un contenu vide.
 
@@ -37,6 +43,10 @@ Critère d'acceptation : la vue s'ouvre via la palette de commandes
 sans erreur.
 
 ## S2-03 — Service de conversation (sans réseau)
+
+État : **terminé** — `contrib/slate/common/slateChatModel.ts` (modèle) et
+`contrib/slate/common/slateChatService.ts` (historique, transitions d'état), singleton enregistré,
+7 tests verts sous `contrib/slate/test/common/`.
 
 Modèle de données des messages, historique en mémoire, service enregistré dans
 l'injecteur de dépendances. Aucun appel réseau à ce stade.

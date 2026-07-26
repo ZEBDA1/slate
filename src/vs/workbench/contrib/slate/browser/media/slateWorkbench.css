@@ -1,0 +1,198 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/*
+ * Slate shell
+ *
+ * The workbench remains theme-aware, but its geometry and surface hierarchy are
+ * intentionally different from the Code - OSS defaults. High-contrast themes are
+ * excluded so their accessibility guarantees remain intact.
+ */
+
+.monaco-workbench:not(.hc-black):not(.hc-light) {
+	--slate-shell-background: color-mix(in srgb, var(--vscode-editor-background) 82%, #080a0d);
+	--slate-raised-background: color-mix(in srgb, var(--vscode-sideBar-background) 90%, #fff 2%);
+	--slate-soft-border: color-mix(in srgb, var(--vscode-foreground) 10%, transparent);
+	--slate-strong-border: color-mix(in srgb, var(--vscode-foreground) 16%, transparent);
+	--slate-radius-small: 7px;
+	--slate-radius-medium: 10px;
+	font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif;
+	background: var(--slate-shell-background);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.titlebar {
+	background: color-mix(in srgb, var(--slate-shell-background) 92%, var(--vscode-focusBorder) 8%);
+	border-bottom: 1px solid var(--slate-soft-border);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.titlebar .command-center-center {
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.titlebar .command-center-center .action-item > .action-label {
+	border-color: var(--slate-soft-border);
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--vscode-input-background) 76%, transparent);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.activitybar {
+	background: var(--slate-shell-background);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.activitybar .action-item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.activitybar .action-item > .action-label {
+	width: 34px;
+	height: 34px;
+	margin: 3px auto;
+	border-radius: var(--slate-radius-small);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.activitybar .action-item.checked > .action-label,
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.activitybar .action-item > .action-label:hover {
+	color: var(--vscode-foreground);
+	background: var(--vscode-toolbar-hoverBackground);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.activitybar .action-item.checked > .action-label::before {
+	display: none;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.sidebar,
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.auxiliarybar {
+	background: var(--slate-raised-background);
+	box-shadow: inset 0 0 0 1px var(--slate-soft-border);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.sidebar.left {
+	border-top-right-radius: var(--slate-radius-medium);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.sidebar.right,
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.auxiliarybar {
+	border-top-left-radius: var(--slate-radius-medium);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .pane-composite-part > .title {
+	padding-left: 4px;
+	border-bottom: 1px solid var(--slate-soft-border);
+	background: transparent;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .pane-composite-part > .title .title-label h2 {
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .pane-header {
+	border: 0;
+	background: transparent;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .pane-header:hover {
+	background: var(--vscode-list-hoverBackground);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.editor {
+	background: var(--slate-shell-background);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.editor > .content {
+	box-shadow: inset 0 1px 0 var(--slate-soft-border);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .editor-group-container > .title {
+	background: var(--slate-shell-background);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .editor-group-container > .title .tabs-and-actions-container {
+	padding: 3px 5px 0;
+	background: var(--slate-shell-background);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .editor-group-container > .title .tabs-container {
+	gap: 3px;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .editor-group-container > .title .tabs-container > .tab {
+	border: 1px solid transparent;
+	border-radius: var(--slate-radius-small) var(--slate-radius-small) 0 0;
+	background: transparent;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .editor-group-container > .title .tabs-container > .tab:hover:not(.active) {
+	background: color-mix(in srgb, var(--vscode-tab-activeBackground) 48%, transparent);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .editor-group-container > .title .tabs-container > .tab.active {
+	border-color: var(--slate-soft-border);
+	border-bottom-color: var(--vscode-editor-background);
+	background: var(--vscode-editor-background);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .editor-group-container > .title .tabs-container > .tab > .tab-border-top-container,
+.monaco-workbench:not(.hc-black):not(.hc-light) .editor-group-container > .title .tabs-container > .tab > .tab-border-bottom-container {
+	display: none;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .editor-group-container > .editor-container {
+	box-shadow: inset 0 1px 0 var(--slate-soft-border);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.panel {
+	border-top: 1px solid var(--slate-soft-border);
+	background: var(--slate-raised-background);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) > .part.statusbar {
+	border-top: 1px solid var(--slate-soft-border);
+	background: var(--slate-shell-background);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .monaco-list-row {
+	border-radius: 5px;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .monaco-list-row.focused,
+.monaco-workbench:not(.hc-black):not(.hc-light) .monaco-list-row.selected {
+	outline: 1px solid var(--slate-soft-border);
+	outline-offset: -1px;
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .monaco-button,
+.monaco-workbench:not(.hc-black):not(.hc-light) .monaco-text-button {
+	border-radius: var(--slate-radius-small);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .monaco-inputbox,
+.monaco-workbench:not(.hc-black):not(.hc-light) .monaco-findInput,
+.monaco-workbench:not(.hc-black):not(.hc-light) .monaco-select-box {
+	border-radius: var(--slate-radius-small);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .quick-input-widget {
+	border: 1px solid var(--slate-strong-border);
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 18px 70px color-mix(in srgb, #000 38%, transparent);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .context-view.monaco-menu-container {
+	border: 1px solid var(--slate-strong-border);
+	border-radius: 9px;
+	overflow: hidden;
+	box-shadow: 0 12px 38px color-mix(in srgb, #000 30%, transparent);
+}
+
+.monaco-workbench:not(.hc-black):not(.hc-light) .monaco-scrollable-element > .scrollbar > .slider {
+	border-radius: 999px;
+}
+

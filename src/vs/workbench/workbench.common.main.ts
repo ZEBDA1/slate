@@ -479,4 +479,7 @@ import './contrib/editTelemetry/browser/editTelemetry.contribution.js';
 // Opener
 import './contrib/opener/browser/opener.contribution.js';
 
+// Slate
+import './contrib/slate/browser/slateChat.contribution.js';
+
 //#endregion

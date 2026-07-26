@@ -46,14 +46,19 @@ src/vs/platform/slateChat/
 
 src/vs/workbench/contrib/slate/
   common/slateChatModel.ts         modèle de messages, indépendant du fournisseur
-  browser/slateChatService.ts      historique, orchestration, assemblage du contexte
+  common/slateChatService.ts       historique et transitions d'état
   browser/slateChatView.ts         rendu (existant, à brancher)
   browser/slateChatApiKey.ts       commandes de saisie et d'effacement de la clé
   electron-browser/slateChatProviderClient.ts  ProxyChannel.toService vers le canal
-  test/                            tests du service de conversation
+  test/common/                     tests du service de conversation
 ```
 
-Le flux d'un message : la vue appelle `SlateChatService` (couche `browser`) ; celui-ci lit la clé
+`slateChatService.ts` est en `common/` et non en `browser/` : `test/unit/node/index.js` exclut
+`**/{browser,electron-browser,electron-main,electron-utility}/**/*.test.js` de son glob, donc un
+test placé sous `test/browser/` ne serait jamais exécuté par `npm run test-node` — ce que S2-03
+exige. Le service n'a de toute façon aucune dépendance au DOM.
+
+Le flux d'un message : la vue appelle `SlateChatService` (couche `common`) ; celui-ci lit la clé
 via `ISecretStorageService`, assemble la requête à partir du modèle et du contexte joint, puis
 appelle `ISlateChatProvider` ; en desktop cette interface est câblée par
 `slateChatProviderClient.ts` sur le canal IPC du processus partagé, où
@@ -83,10 +88,18 @@ Dans `contrib/slate/common/slateChatModel.ts` :
 Dans `platform/slateChat/common/slateChatProvider.ts`, les événements du fournisseur :
 `text-delta`, `reasoning-delta`, `usage`, `done`, `error`. Rien d'autre ne franchit la frontière.
 
-`SlateChatService` tient l'historique en mémoire et expose `sendMessage(text, token)`. Le
-fournisseur lui est injecté par le constructeur ; les tests passent une fausse implémentation de
-`ISlateChatProvider` — pas de cast `any`, pas de global truqué, conformément aux instructions du
-dépôt. Tests sous `contrib/slate/test/`, exécutés par `npm run test-node`.
+`SlateChatService` (`contrib/slate/common/slateChatService.ts`) tient l'historique en mémoire et
+est le seul écrivain de ses messages. Il expose l'ajout d'un tour utilisateur et d'un tour
+assistant, l'application des deltas, et les trois transitions terminales — rien de réseau : c'est
+le client de fournisseur de S2-06 qui le pilotera à mesure que les événements arrivent.
+
+Le générateur d'identifiants est un paramètre de constructeur avec la vraie implémentation par
+défaut, ce qui permet aux tests d'affirmer sur des messages entiers sans cast `any` ni global
+truqué, conformément aux instructions du dépôt. C'est aussi pourquoi l'enregistrement du singleton
+passe par la surcharge `SyncDescriptor` : la surcharge à constructeur exige que tout paramètre soit
+un service.
+
+Tests sous `contrib/slate/test/common/`, exécutés par `npm run test-node`.
 
 ## 4. Protocole IPC
 
